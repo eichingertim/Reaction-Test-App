@@ -1,0 +1,14 @@
+<resources>
+
+    <string name="app_name">HCI Reaction Test</string>
+
+    <string name="main_menu_headline">Main-Menu for Reaction-Test App</string>
+
+    <string name="btn_visual_text">Visueller Reiz</string>
+    <string name="btn_acoustic_text">akustischer Reiz</string>
+    <string name="btn_desicions_text">Entscheidung</string>
+    <string name="btn_filter_text">Filterung von Reizen</string>
+
+
+
+</resources>
