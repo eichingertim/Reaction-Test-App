@@ -1,23 +1,31 @@
 package com.teapps.hcireactiontest.reaction_tests;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.teapps.hcireactiontest.R;
+import com.teapps.hcireactiontest.database.DBHelper;
 
 import java.util.Random;
 
 public class AcousticReactionTestActivity extends AppCompatActivity implements View.OnClickListener {
+
+    SharedPreferences sharedPref;
 
     Button btnStop, btnStart;
     TextView tvTime;
@@ -29,10 +37,17 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
 
     MediaPlayer mediaPlayer;
 
+    DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acustic_reaction_test);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         initObjects();
         initHandler();
@@ -47,6 +62,7 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
 
     private void initHandler() {
         handler = new Handler();
+        dbHelper = new DBHelper(this);
     }
 
     private void initObjects() {
@@ -91,6 +107,7 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
     private void stopTest() {
         handler.removeCallbacks(runnable);
         mediaPlayer.stop();
+        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), ""), timeInMilliSeconds.toString());
     }
 
 
@@ -139,5 +156,15 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
         }
 
     };
+
+    private void addDataToDatabase(String testUserID, String reactionTime) {
+        boolean insertData = dbHelper.addData(testUserID, getString(R.string.acoustic_test_type), reactionTime);
+        if (insertData) {
+            Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Data storing failed", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 
 }

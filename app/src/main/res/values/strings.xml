@@ -4,11 +4,26 @@
 
     <string name="main_menu_headline">Main-Menu for Reaction-Test App</string>
 
-    <string name="btn_visual_text">Visueller Reiz</string>
-    <string name="btn_acoustic_text">akustischer Reiz</string>
-    <string name="btn_desicions_text">Entscheidung</string>
-    <string name="btn_filter_text">Filterung von Reizen</string>
+    <string name="btn_visual_text">Reaktionszeit auf einen visuellen Reiz</string>
+    <string name="btn_acoustic_text">Reaktionszeit auf einen akustischen Reiz</string>
+    <string name="btn_desicions_text">Reaktionszeit mit Entscheidung</string>
+    <string name="btn_filter_text">Reaktionszeit mit Filterung von Reizen</string>
 
+    <!--Test-Types-->
+    <string name="visual_test_type">visual</string>
+    <string name="acoustic_test_type">acoustic</string>
+    <string name="decision_test_type">decision</string>
+    <string name="filter_test_type">filter</string>
+
+    <!--Dialog-Texts-->
+    <string name="dialog_title">Test-User Info</string>
+    <string name="dialog_save">Speichern</string>
+    <string name="dialog_cancel">Abbrechen</string>
+
+    <!--Keys SharedPrefernces-->
+    <string name="KEY_USERID">userID</string>
+    <string name="KEY_AGE">age</string>
+    <string name="KEY_GENDER">gender</string>
 
 
 </resources>
