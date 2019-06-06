@@ -1,12 +1,9 @@
 package com.teapps.hcireactiontest.reaction_tests;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -14,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,12 +19,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.opencsv.CSVWriter;
 import com.teapps.hcireactiontest.R;
 import com.teapps.hcireactiontest.database.DBHelper;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.Random;
 
 public class VisualReactionTestActivity extends AppCompatActivity implements View.OnClickListener {
@@ -41,8 +34,7 @@ public class VisualReactionTestActivity extends AppCompatActivity implements Vie
 
     Handler handler;
 
-    Long TimeInMilliSeconds, startTime;
-    int seconds, milliseconds;
+    Long timeInMilliSeconds, startTime;
 
     SharedPreferences sharedPref;
 
@@ -90,22 +82,20 @@ public class VisualReactionTestActivity extends AppCompatActivity implements Vie
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
-                btnStart.setEnabled(false);
-                btnStop.setEnabled(true);
                 break;
             case R.id.btnAction:
                 stopTest();
-                btnStart.setEnabled(true);
-                btnStop.setEnabled(false);
                 break;
         }
     }
 
     private void stopTest() {
-        handler.removeCallbacks(runnable);
+        handler.removeCallbacks(stopWatchRunnable);
         addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
-                , TimeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "") ,sharedPref.getString(getString(R.string.KEY_AGE), "0"));
+                , timeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "") ,sharedPref.getString(getString(R.string.KEY_AGE), "0"));
         tvTime.setVisibility(View.VISIBLE);
+        btnStart.setEnabled(true);
+        btnStop.setEnabled(false);
     }
 
 
@@ -120,31 +110,33 @@ public class VisualReactionTestActivity extends AppCompatActivity implements Vie
         new CountDownTimer(timeTillRed, 1000) {
 
             public void onTick(long millisUntilFinished) {
+
             }
 
             public void onFinish() {
+                btnStop.setEnabled(true);
                 colorContainer.setBackgroundColor(Color.parseColor("#ff0000"));
                 startTime = SystemClock.uptimeMillis();
-                handler.postDelayed(runnable, 0);
+                handler.postDelayed(stopWatchRunnable, 0);
             }
         }.start();
-
+        btnStart.setEnabled(false);
 
     }
 
-    public Runnable runnable = new Runnable() {
+    public Runnable stopWatchRunnable = new Runnable() {
 
         public void run() {
 
-            TimeInMilliSeconds = SystemClock.uptimeMillis() - startTime;
+            timeInMilliSeconds = SystemClock.uptimeMillis() - startTime;
 
-            seconds = (int) (TimeInMilliSeconds / 1000);
-            seconds = seconds % 60;
+            @SuppressLint("DefaultLocale") String seconds = String.format("%02d"
+                    , ((int) (timeInMilliSeconds / 1000))%60);
+            @SuppressLint("DefaultLocale") String milliseconds = String.format("%03d"
+                    ,(int) (timeInMilliSeconds % 1000));
 
-            milliseconds = (int) (TimeInMilliSeconds % 1000);
-
-            tvTime.setText(String.format("%02d", seconds) + ":"
-                    + String.format("%03d", milliseconds));
+            String time = seconds + ":" + milliseconds;
+            tvTime.setText(time);
 
             handler.postDelayed(this, 0);
 
@@ -177,12 +169,15 @@ public class VisualReactionTestActivity extends AppCompatActivity implements Vie
 
     }
 
-    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender
+            , String age) {
         boolean insertData = dbHelper.addData(testUserID, getString(R.string.visual_test_type), reactionTime, gender, age);
         if (insertData) {
-            Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)
+                    , Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "Data storing failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_failure)
+                    , Toast.LENGTH_SHORT).show();
 
         }
     }

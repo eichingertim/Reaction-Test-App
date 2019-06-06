@@ -1,5 +1,6 @@
 package com.teapps.hcireactiontest.reaction_tests;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -25,21 +26,20 @@ import java.util.Random;
 
 public class DecisionReactionTestActivity extends AppCompatActivity implements View.OnClickListener {
 
-    SharedPreferences sharedPref;
+    private SharedPreferences sharedPref;
 
-    Button btnStopRed, btnStopBlue, btnStart;
-    TextView tvTime;
-    View colorContainer;
+    private Button btnStopRed, btnStopBlue, btnStart;
+    private TextView tvTime;
+    private View colorContainer;
 
-    DBHelper dbHelper;
-    Handler handler;
+    private DBHelper dbHelper;
 
-    Long timeInMilliSeconds, startTime;
-    int seconds, milliseconds;
+    private Handler handler;
 
-    int randomIntForColor = 0;
+    private Long timeInMilliSeconds, startTime;
 
-    Random randomForColor;
+    private int randomIntForColor = 0;
+    private Random randomForColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +91,6 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
@@ -101,7 +100,6 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
                 showHelpDialog();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -114,39 +112,35 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
-                btnStart.setEnabled(false);
-                btnStopBlue.setEnabled(true);
-                btnStopRed.setEnabled(true);
                 break;
             case R.id.btnActionRed:
                 if (randomIntForColor == 0) {
                     stopTest();
-                    btnStart.setEnabled(true);
-                    btnStopBlue.setEnabled(false);
-                    btnStopRed.setEnabled(false);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Falscher Button", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.false_button)
+                            , Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btnActionBlue:
                 if (randomIntForColor == 1) {
                     stopTest();
-                    btnStart.setEnabled(true);
-                    btnStopBlue.setEnabled(false);
-                    btnStopRed.setEnabled(false);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Falscher Button", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.false_button)
+                            , Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
     private void stopTest() {
-        handler.removeCallbacks(runnable);
+        handler.removeCallbacks(stopWatchRunnable);
         addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
                 , timeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "")
                 , sharedPref.getString(getString(R.string.KEY_AGE), "0"));
         tvTime.setVisibility(View.VISIBLE);
+        btnStart.setEnabled(true);
+        btnStopBlue.setEnabled(false);
+        btnStopRed.setEnabled(false);
     }
 
 
@@ -164,40 +158,46 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
             }
 
             public void onFinish() {
-                try {
-                    randomForColor = new Random();
-                    randomIntForColor = randomForColor.nextInt(2);
-
-                    if (randomIntForColor == 0) {
-                        colorContainer.setBackgroundColor(Color.RED);
-                    } else {
-                        colorContainer.setBackgroundColor(Color.BLUE);
-                    }
-                    startTime = SystemClock.uptimeMillis();
-                    handler.postDelayed(runnable, 200);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                btnStopBlue.setEnabled(true);
+                btnStopRed.setEnabled(true);
+                displayTheAction();
             }
         }.start();
+        btnStart.setEnabled(false);
 
 
     }
 
-    public Runnable runnable = new Runnable() {
+    private void displayTheAction() {
+        try {
+            randomForColor = new Random();
+            randomIntForColor = randomForColor.nextInt(2);
+
+            if (randomIntForColor == 0) {
+                colorContainer.setBackgroundColor(Color.RED);
+            } else {
+                colorContainer.setBackgroundColor(Color.BLUE);
+            }
+            startTime = SystemClock.uptimeMillis();
+            handler.postDelayed(stopWatchRunnable, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Runnable stopWatchRunnable = new Runnable() {
 
         public void run() {
 
             timeInMilliSeconds = SystemClock.uptimeMillis() - startTime;
 
-            seconds = (int) (timeInMilliSeconds / 1000);
-            seconds = seconds % 60;
+            @SuppressLint("DefaultLocale") String seconds = String.format("%02d"
+                    , ((int) (timeInMilliSeconds / 1000))%60);
+            @SuppressLint("DefaultLocale") String milliseconds = String.format("%03d"
+                    ,(int) (timeInMilliSeconds % 1000));
 
-            milliseconds = (int) (timeInMilliSeconds % 1000);
-
-            tvTime.setText(String.format("%02d", seconds) + ":"
-                    + String.format("%03d", milliseconds));
+            String time = seconds + ":" + milliseconds;
+            tvTime.setText(time);
 
             handler.postDelayed(this, 0);
 
@@ -205,12 +205,15 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     };
 
-    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender
+            , String age) {
         boolean insertData = dbHelper.addData(testUserID, getString(R.string.decision_test_type), reactionTime, gender, age);
         if (insertData) {
-            Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)
+                    , Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "Data storing failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_failure)
+                    , Toast.LENGTH_SHORT).show();
 
         }
     }

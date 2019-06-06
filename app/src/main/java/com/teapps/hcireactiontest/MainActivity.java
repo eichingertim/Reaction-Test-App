@@ -7,8 +7,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -57,16 +59,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermission() {
-
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
+        if (!checkPermission()) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     0);
         }
 
+    }
+
+    private boolean checkPermission() {
+        return ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private void setOnClickListeners() {
@@ -80,9 +84,27 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, cls));
+                if (checkPermission()) {
+                    startActivity(new Intent(MainActivity.this, cls));
+                } else {
+                    showSnackBar();
+                }
+
             }
         });
+    }
+
+    private void showSnackBar() {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.main_layout)
+                , getString(R.string.snackbar_message), Snackbar.LENGTH_LONG);
+        snackbar.setAction(getString(R.string.snackbar_action), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestPermission();
+            }
+        });
+        snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.colorOrange));
+        snackbar.show();
     }
 
     private void initObjects() {
@@ -140,19 +162,27 @@ public class MainActivity extends AppCompatActivity {
                 showUserInfoDialog();
                 break;
             case R.id.action_save_database_to_csv:
-                try {
-                    exportDB();
-                    DBHelper dbHelper = new DBHelper(this);
-                    dbHelper.clearDatabase();
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.write_csv_failure)
-                            , Toast.LENGTH_SHORT).show();
+                if (checkPermission()) {
+                    tryExportDatabase();
+                } else {
+                    showSnackBar();
                 }
                 break;
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void tryExportDatabase() {
+        try {
+            exportDB();
+            DBHelper dbHelper = new DBHelper(this);
+            dbHelper.clearDatabase();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), getString(R.string.write_csv_failure)
+                    , Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showUserInfoDialog() {

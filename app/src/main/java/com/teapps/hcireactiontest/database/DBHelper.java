@@ -7,8 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String TAG = "DBHelper";
-
     private static final String TABLE_NAME = "reaction_database";
     private static final String COLUMN_1 = "ID";
     private static final String COLUMN_2 = "user_id";

@@ -38,16 +38,19 @@
     <string name="radio_btn_female">weiblich</string>
     
     <!--Toast texts for Exceptions or success-->
+    <string name="database_storing_successfull">Datensatz erfolgreich gespeichert</string>
+    <string name="database_storing_failure">Datensatz speichern fehlgeschlagen</string>
     <string name="write_csv_succeed">CSV-Datei wurde unter "Documents" gespeichert</string>
     <string name="write_csv_failure">Speichern der CSV-Datei ist fehlgeschlagen</string>
     <string name="user_info_updated">Test-User Info wurde aktualisiert</string>
+    <string name="false_button">Falscher Button</string>
 
     <!--Hints for EditTexts-->
     <string name="hint_txt_userID">UserID (nur Buchstaben)</string>
     <string name="hint_txt_age">Alter</string>
 
     <!--Button-Texts for Reaction Tests Activities-->
-    <string name="btn_text_start">Starten</string>
+    <string name="btn_text_start">Start</string>
     <string name="btn_text_stop">Stopp</string>
     <string name="btn_text_stop_red">Rot</string>
     <string name="btn_text_stop_blue">Blau</string>
@@ -60,6 +63,10 @@
     <string name="help_acoustic"></string>
     <string name="help_decision"></string>
     <string name="help_filter"></string>
+
+    <!--Snackbar Texts-->
+    <string name="snackbar_message">Keine Berechtigung erhalten</string>
+    <string name="snackbar_action">Berechtigen</string>
 
     
 

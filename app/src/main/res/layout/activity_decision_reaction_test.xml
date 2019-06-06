@@ -23,7 +23,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="00:000"
+        android:text="@string/default_time_value"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@+id/view_color_container"
         app:layout_constraintStart_toEndOf="@+id/textView3"
@@ -47,7 +47,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,8 +57,10 @@
             android:id="@+id/btnActionRed"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="RED"
+            android:background="@drawable/black_border_shape_round_corners"
+            android:text="@string/btn_text_stop_red"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textSize="24sp" />
 
@@ -67,8 +68,10 @@
             android:id="@+id/btnActionBlue"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:text="BLUE"
+            android:background="@drawable/black_border_shape_round_corners"
+            android:text="@string/btn_text_stop_blue"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textSize="24sp" />
 
@@ -78,8 +81,11 @@
         android:id="@+id/btnStart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"
-        android:text="START"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/black_border_shape_round_corners"
+        android:text="@string/btn_text_start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_time" />

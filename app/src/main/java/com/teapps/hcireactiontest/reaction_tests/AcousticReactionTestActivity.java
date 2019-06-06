@@ -1,5 +1,6 @@
 package com.teapps.hcireactiontest.reaction_tests;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
@@ -24,19 +25,18 @@ import java.util.Random;
 
 public class AcousticReactionTestActivity extends AppCompatActivity implements View.OnClickListener {
 
-    SharedPreferences sharedPref;
+    private SharedPreferences sharedPref;
 
-    Button btnStop, btnStart;
-    TextView tvTime;
+    private Button btnStop, btnStart;
+    private TextView tvTime;
 
-    Handler handler;
+    private DBHelper dbHelper;
 
-    Long timeInMilliSeconds, startTime;
-    int seconds, milliseconds;
+    private Handler handler;
 
-    MediaPlayer mediaPlayer;
+    private Long timeInMilliSeconds, startTime;
 
-    DBHelper dbHelper;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,24 +106,22 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
-                btnStart.setEnabled(false);
-                btnStop.setEnabled(true);
                 break;
             case R.id.btnAction:
                 stopTest();
-                btnStart.setEnabled(true);
-                btnStop.setEnabled(false);
                 break;
         }
     }
 
     private void stopTest() {
-        handler.removeCallbacks(runnable);
+        handler.removeCallbacks(stopwatchRunnable);
         mediaPlayer.stop();
         addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
                 , timeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "")
                 , sharedPref.getString(getString(R.string.KEY_AGE), "0"));
         tvTime.setVisibility(View.VISIBLE);
+        btnStart.setEnabled(true);
+        btnStop.setEnabled(false);
     }
 
 
@@ -139,34 +137,40 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
             }
 
             public void onFinish() {
-                try {
-                    mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
-                    mediaPlayer.start();
-                    startTime = SystemClock.uptimeMillis();
-                    handler.postDelayed(runnable, 200);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                playAction();
             }
         }.start();
+        btnStart.setEnabled(false);
 
 
     }
 
-    public Runnable runnable = new Runnable() {
+    private void playAction() {
+        try {
+            btnStop.setEnabled(true);
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+            mediaPlayer.start();
+            startTime = SystemClock.uptimeMillis();
+            handler.postDelayed(stopwatchRunnable, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public Runnable stopwatchRunnable = new Runnable() {
 
         public void run() {
 
             timeInMilliSeconds = SystemClock.uptimeMillis() - startTime;
 
-            seconds = (int) (timeInMilliSeconds / 1000);
-            seconds = seconds % 60;
+            @SuppressLint("DefaultLocale") String seconds = String.format("%02d"
+                    , ((int) (timeInMilliSeconds / 1000))%60);
+            @SuppressLint("DefaultLocale") String milliseconds = String.format("%03d"
+                    ,(int) (timeInMilliSeconds % 1000));
 
-            milliseconds = (int) (timeInMilliSeconds % 1000);
-
-            tvTime.setText(String.format("%02d", seconds) + ":"
-                    + String.format("%03d", milliseconds));
+            String time = seconds + ":" + milliseconds;
+            tvTime.setText(time);
 
             handler.postDelayed(this, 0);
 
@@ -174,12 +178,15 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
 
     };
 
-    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender
+            , String age) {
         boolean insertData = dbHelper.addData(testUserID, getString(R.string.acoustic_test_type), reactionTime, gender, age);
         if (insertData) {
-            Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)
+                    , Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getApplicationContext(), "Data storing failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.database_storing_failure)
+                    , Toast.LENGTH_SHORT).show();
 
         }
     }
