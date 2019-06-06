@@ -1,13 +1,16 @@
 package com.teapps.hcireactiontest;
 
-import android.content.Context;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,7 +22,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.opencsv.CSVWriter;
@@ -34,7 +36,7 @@ import java.io.FileWriter;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnVisual, btnAcoustic, btnDesicions, btnFilter;
+    private Button btnVisual, btnAcoustic, btnDecision, btnFilter;
     SharedPreferences sharedPref;
 
     @Override
@@ -44,16 +46,33 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        requestPermission();
+
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         initObjects();
         setOnClickListeners();
+
+
+    }
+
+    private void requestPermission() {
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    0);
+        }
 
     }
 
     private void setOnClickListeners() {
         setOnClickListener(VisualReactionTestActivity.class, btnVisual);
         setOnClickListener(AcousticReactionTestActivity.class, btnAcoustic);
-        setOnClickListener(DecisionReactionTestActivity.class, btnDesicions);
+        setOnClickListener(DecisionReactionTestActivity.class, btnDecision);
         setOnClickListener(FilterReactionTestActivity.class, btnFilter);
     }
 
@@ -69,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private void initObjects() {
         btnVisual = findViewById(R.id.btnVisual);
         btnAcoustic = findViewById(R.id.btnAcustics);
-        btnDesicions = findViewById(R.id.btnDesicions);
+        btnDecision = findViewById(R.id.btnDesicions);
         btnFilter = findViewById(R.id.btnFilter);
     }
 
@@ -77,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
 
         DBHelper dbHelper = new DBHelper(this);
 
-        File exportDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "csvfiles");
+        File exportDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOCUMENTS), "csvfiles");
         if (!exportDir.exists()) {
             exportDir.mkdirs();
         }
@@ -88,16 +108,18 @@ public class MainActivity extends AppCompatActivity {
             file.createNewFile();
             CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
             SQLiteDatabase db = dbHelper.getReadableDatabase();
-            Cursor curCSV = db.rawQuery("SELECT * FROM reaction_test_app_database", null);
+            Cursor curCSV = db.rawQuery("SELECT * FROM reaction_database", null);
             csvWrite.writeNext(curCSV.getColumnNames());
             while (curCSV.moveToNext()) {
-                //Which column you want to exprort
-                String arrStr[] = {curCSV.getString(0), curCSV.getString(1), curCSV.getString(2), curCSV.getString(3)};
+                String arrStr[] = {curCSV.getString(0), curCSV.getString(1)
+                        , curCSV.getString(2), curCSV.getString(3)
+                        , curCSV.getString(4), curCSV.getString(5)};
                 csvWrite.writeNext(arrStr);
             }
             csvWrite.close();
             curCSV.close();
-            Toast.makeText(getApplicationContext(), "CSV-Datei gespeichert", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.write_csv_succeed)
+                    , Toast.LENGTH_LONG).show();
         } catch (Exception sqlEx) {
             Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
         }
@@ -123,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
                     DBHelper dbHelper = new DBHelper(this);
                     dbHelper.clearDatabase();
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Fehler bei CSV schreiben", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.write_csv_failure)
+                            , Toast.LENGTH_SHORT).show();
                 }
                 break;
 
@@ -169,7 +192,18 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(getString(R.string.KEY_USERID), txtUserID.getText().toString());
         editor.putString(getString(R.string.KEY_AGE), txtAge.getText().toString());
         editor.putInt(getString(R.string.KEY_GENDER), radioGroup.getCheckedRadioButtonId());
+        if (radioGroup.getCheckedRadioButtonId() == R.id.rb_female) {
+            editor.putString(getString(R.string.KEY_GENDER_STRING)
+                    , getString(R.string.value_female));
+        } else {
+            editor.putString(getString(R.string.KEY_GENDER_STRING)
+                    , getString(R.string.value_male));
+        }
         editor.commit();
 
+        Toast.makeText(getApplicationContext(), getString(R.string.user_info_updated)
+                , Toast.LENGTH_SHORT).show();
+
     }
+
 }

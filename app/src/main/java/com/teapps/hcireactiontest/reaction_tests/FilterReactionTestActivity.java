@@ -73,9 +73,11 @@ public class FilterReactionTestActivity extends AppCompatActivity implements Vie
         btnStart = findViewById(R.id.btnStart);
         colorContainer = findViewById(R.id.view_color_container);
         tvTime = findViewById(R.id.text_view_time);
+        tvTime.setVisibility(View.INVISIBLE);
 
         btnStart.setOnClickListener(this);
         btnStop.setOnClickListener(this);
+        btnStop.setEnabled(false);
 
     }
 
@@ -84,21 +86,29 @@ public class FilterReactionTestActivity extends AppCompatActivity implements Vie
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
+                btnStart.setEnabled(false);
+                btnStop.setEnabled(true);
                 break;
             case R.id.btnAction:
                 stopTest();
+                btnStart.setEnabled(true);
+                btnStop.setEnabled(false);
                 break;
         }
     }
 
     private void stopTest() {
         handler.removeCallbacks(runnable);
-        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), ""), TimeInMilliSeconds.toString());
+        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
+                , TimeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "")
+                , sharedPref.getString(getString(R.string.KEY_AGE), "0"));
+        tvTime.setVisibility(View.VISIBLE);
     }
 
 
     private void startTest() {
-        tvTime.setText("00:000");
+        tvTime.setVisibility(View.INVISIBLE);
+        tvTime.setText(R.string.default_time_value);
         colorContainer.setBackground(ContextCompat.getDrawable(getApplicationContext()
                 , R.drawable.black_border_shape));
         Random random = new Random();
@@ -143,6 +153,7 @@ public class FilterReactionTestActivity extends AppCompatActivity implements Vie
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_test_activities, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -153,13 +164,21 @@ public class FilterReactionTestActivity extends AppCompatActivity implements Vie
             case android.R.id.home:
                 onBackPressed();
                 break;
+            case R.id.nav_help:
+                showHelpDialog();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void addDataToDatabase(String testUserID, String reactionTime) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.filter_test_type), reactionTime);
+    private void showHelpDialog() {
+
+    }
+
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+        boolean insertData = dbHelper.addData(testUserID, getString(R.string.filter_test_type)
+                , reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
         } else {

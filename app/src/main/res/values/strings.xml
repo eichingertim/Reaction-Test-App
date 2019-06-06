@@ -19,11 +19,51 @@
     <string name="dialog_title">Test-User Info</string>
     <string name="dialog_save">Speichern</string>
     <string name="dialog_cancel">Abbrechen</string>
+    
+    <!--Default Time value-->
+    <string name="default_time_value">00:000</string>
 
     <!--Keys SharedPrefernces-->
     <string name="KEY_USERID">userID</string>
     <string name="KEY_AGE">age</string>
     <string name="KEY_GENDER">gender</string>
+    <string name="KEY_GENDER_STRING">gender_string</string>
+
+    <!--Values SharedPreferences gender-->
+    <string name="value_male">maennlich</string>
+    <string name="value_female">weiblich</string>
+
+    <!--Radio-Group Texts-->
+    <string name="radio_btn_male">männlich</string>
+    <string name="radio_btn_female">weiblich</string>
+    
+    <!--Toast texts for Exceptions or success-->
+    <string name="write_csv_succeed">CSV-Datei wurde unter "Documents" gespeichert</string>
+    <string name="write_csv_failure">Speichern der CSV-Datei ist fehlgeschlagen</string>
+    <string name="user_info_updated">Test-User Info wurde aktualisiert</string>
+
+    <!--Hints for EditTexts-->
+    <string name="hint_txt_userID">UserID (nur Buchstaben)</string>
+    <string name="hint_txt_age">Alter</string>
+
+    <!--Button-Texts for Reaction Tests Activities-->
+    <string name="btn_text_start">Starten</string>
+    <string name="btn_text_stop">Stopp</string>
+    <string name="btn_text_stop_red">Rot</string>
+    <string name="btn_text_stop_blue">Blau</string>
+
+    <!--Menu items title-->
+    <string name="item_help_text">Hilfe</string>
+
+    <!--Help texts for the 4 test-activities-->
+    <string name="help_visual"></string>
+    <string name="help_acoustic"></string>
+    <string name="help_decision"></string>
+    <string name="help_filter"></string>
+
+    
+
+
 
 
 </resources>

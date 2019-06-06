@@ -1,6 +1,5 @@
 package com.teapps.hcireactiontest.reaction_tests;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
@@ -69,14 +68,17 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
         btnStop = findViewById(R.id.btnAction);
         btnStart = findViewById(R.id.btnStart);
         tvTime = findViewById(R.id.text_view_time);
+        tvTime.setVisibility(View.INVISIBLE);
 
         btnStart.setOnClickListener(this);
         btnStop.setOnClickListener(this);
+        btnStop.setEnabled(false);
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_test_activities, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -87,9 +89,16 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
             case android.R.id.home:
                 onBackPressed();
                 break;
+            case R.id.nav_help:
+                showHelpDialog();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showHelpDialog() {
+
     }
 
     @Override
@@ -97,9 +106,13 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
+                btnStart.setEnabled(false);
+                btnStop.setEnabled(true);
                 break;
             case R.id.btnAction:
                 stopTest();
+                btnStart.setEnabled(true);
+                btnStop.setEnabled(false);
                 break;
         }
     }
@@ -107,12 +120,16 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
     private void stopTest() {
         handler.removeCallbacks(runnable);
         mediaPlayer.stop();
-        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), ""), timeInMilliSeconds.toString());
+        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
+                , timeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "")
+                , sharedPref.getString(getString(R.string.KEY_AGE), "0"));
+        tvTime.setVisibility(View.VISIBLE);
     }
 
 
     private void startTest() {
-        tvTime.setText("00:000");
+        tvTime.setVisibility(View.INVISIBLE);
+        tvTime.setText(R.string.default_time_value);
         Random random = new Random();
         int timeTillRed = (random.nextInt(9) + 4) * 1000;
 
@@ -157,8 +174,8 @@ public class AcousticReactionTestActivity extends AppCompatActivity implements V
 
     };
 
-    private void addDataToDatabase(String testUserID, String reactionTime) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.acoustic_test_type), reactionTime);
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+        boolean insertData = dbHelper.addData(testUserID, getString(R.string.acoustic_test_type), reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
         } else {

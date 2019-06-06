@@ -72,16 +72,20 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
         btnStopBlue = findViewById(R.id.btnActionBlue);
         btnStart = findViewById(R.id.btnStart);
         tvTime = findViewById(R.id.text_view_time);
+        tvTime.setVisibility(View.INVISIBLE);
         colorContainer = findViewById(R.id.view_color_container);
 
         btnStart.setOnClickListener(this);
         btnStopRed.setOnClickListener(this);
+        btnStopRed.setEnabled(false);
         btnStopBlue.setOnClickListener(this);
+        btnStopBlue.setEnabled(false);
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_test_activities, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -92,9 +96,17 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
             case android.R.id.home:
                 onBackPressed();
                 break;
+
+            case R.id.nav_help:
+                showHelpDialog();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showHelpDialog() {
+
     }
 
     @Override
@@ -102,10 +114,16 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
         switch (v.getId()) {
             case R.id.btnStart:
                 startTest();
+                btnStart.setEnabled(false);
+                btnStopBlue.setEnabled(true);
+                btnStopRed.setEnabled(true);
                 break;
             case R.id.btnActionRed:
                 if (randomIntForColor == 0) {
                     stopTest();
+                    btnStart.setEnabled(true);
+                    btnStopBlue.setEnabled(false);
+                    btnStopRed.setEnabled(false);
                 } else {
                     Toast.makeText(getApplicationContext(), "Falscher Button", Toast.LENGTH_SHORT).show();
                 }
@@ -113,6 +131,9 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
             case R.id.btnActionBlue:
                 if (randomIntForColor == 1) {
                     stopTest();
+                    btnStart.setEnabled(true);
+                    btnStopBlue.setEnabled(false);
+                    btnStopRed.setEnabled(false);
                 } else {
                     Toast.makeText(getApplicationContext(), "Falscher Button", Toast.LENGTH_SHORT).show();
                 }
@@ -122,12 +143,16 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     private void stopTest() {
         handler.removeCallbacks(runnable);
-        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), ""), timeInMilliSeconds.toString());
+        addDataToDatabase(sharedPref.getString(getString(R.string.KEY_USERID), "")
+                , timeInMilliSeconds.toString(), sharedPref.getString(getString(R.string.KEY_GENDER_STRING), "")
+                , sharedPref.getString(getString(R.string.KEY_AGE), "0"));
+        tvTime.setVisibility(View.VISIBLE);
     }
 
 
     private void startTest() {
-        tvTime.setText("00:000");
+        tvTime.setVisibility(View.INVISIBLE);
+        tvTime.setText(R.string.default_time_value);
         colorContainer.setBackground(ContextCompat.getDrawable(getApplicationContext()
                 , R.drawable.black_border_shape));
         Random random = new Random();
@@ -180,8 +205,8 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     };
 
-    private void addDataToDatabase(String testUserID, String reactionTime) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.decision_test_type), reactionTime);
+    private void addDataToDatabase(String testUserID, String reactionTime, String gender, String age) {
+        boolean insertData = dbHelper.addData(testUserID, getString(R.string.decision_test_type), reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), "Data successfully stored", Toast.LENGTH_SHORT).show();
         } else {

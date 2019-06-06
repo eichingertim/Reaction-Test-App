@@ -4,6 +4,6 @@
 
     <stroke
         android:width="3dp"
-        android:color="@color/colorPrimary"/>
+        android:color="@color/colorAccent"/>
 
 </shape>
