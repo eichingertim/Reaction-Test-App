@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_user_info"
-        android:title="Test-User Info"
+        android:title="@string/user_infos"
         android:icon="@drawable/ic_person_black_24dp"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_save_database_to_csv"
-        android:title="Save DB to csv"
+        android:title="@string/save_csv"
         android:icon="@drawable/ic_save_black_24dp"
         app:showAsAction="always"/>
 

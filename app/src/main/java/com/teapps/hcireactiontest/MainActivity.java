@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         DBHelper dbHelper = new DBHelper(this);
 
         File exportDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOCUMENTS), "csvfiles");
+                Environment.DIRECTORY_DOCUMENTS), "rtest_csvfiles");
         if (!exportDir.exists()) {
             exportDir.mkdirs();
         }

@@ -57,6 +57,8 @@
 
     <!--Menu items title-->
     <string name="item_help_text">Hilfe</string>
+    <string name="save_csv">Datenbank in CSV-Datei speichern</string>
+    <string name="user_infos">Test-User Infos</string>
 
     <!--Help texts for the 4 test-activities-->
     <string name="help_visual"></string>
