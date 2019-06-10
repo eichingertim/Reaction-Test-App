@@ -24,7 +24,8 @@ import com.teapps.hcireactiontest.database.DBHelper;
 
 import java.util.Random;
 
-public class DecisionReactionTestActivity extends AppCompatActivity implements View.OnClickListener {
+public class DecisionReactionTestActivity extends AppCompatActivity
+        implements View.OnClickListener {
 
     private SharedPreferences sharedPref;
 
@@ -39,7 +40,6 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
     private Long timeInMilliSeconds, startTime;
 
     private int randomIntForColor = 0;
-    private Random randomForColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +170,7 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     private void displayTheAction() {
         try {
-            randomForColor = new Random();
+            Random randomForColor = new Random();
             randomIntForColor = randomForColor.nextInt(2);
 
             if (randomIntForColor == 0) {
@@ -207,7 +207,7 @@ public class DecisionReactionTestActivity extends AppCompatActivity implements V
 
     private void addDataToDatabase(String testUserID, String reactionTime, String gender
             , String age) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.decision_test_type), reactionTime, gender, age);
+        boolean insertData = dbHelper.addDataToDB(testUserID, getString(R.string.decision_test_type), reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)
                     , Toast.LENGTH_SHORT).show();

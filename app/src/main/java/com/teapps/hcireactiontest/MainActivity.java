@@ -114,8 +114,12 @@ public class MainActivity extends AppCompatActivity {
         btnFilter = findViewById(R.id.btnFilter);
     }
 
+    //Used the OpenCSV library found at:
+    //URL: http://opencsv.sourceforge.net/dependency-info.html
+    //
+    //Tutorial found at:
+    //URL: https://stackoverflow.com/questions/31367270/exporting-sqlite-database-to-csv-file-in-android
     private void exportDB() {
-
         DBHelper dbHelper = new DBHelper(this);
 
         File exportDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -124,26 +128,26 @@ public class MainActivity extends AppCompatActivity {
             exportDir.mkdirs();
         }
 
-        File file = new File(exportDir
+        File csvFile = new File(exportDir
                 , sharedPref.getString(getString(R.string.KEY_USERID), "testuser") + ".csv");
         try {
-            file.createNewFile();
-            CSVWriter csvWrite = new CSVWriter(new FileWriter(file));
+            csvFile.createNewFile();
+            CSVWriter writer = new CSVWriter(new FileWriter(csvFile));
             SQLiteDatabase db = dbHelper.getReadableDatabase();
-            Cursor curCSV = db.rawQuery("SELECT * FROM reaction_database", null);
-            csvWrite.writeNext(curCSV.getColumnNames());
-            while (curCSV.moveToNext()) {
-                String arrStr[] = {curCSV.getString(0), curCSV.getString(1)
-                        , curCSV.getString(2), curCSV.getString(3)
-                        , curCSV.getString(4), curCSV.getString(5)};
-                csvWrite.writeNext(arrStr);
+            Cursor cursor = db.rawQuery("SELECT * FROM reaction_database", null);
+            writer.writeNext(cursor.getColumnNames());
+            while (cursor.moveToNext()) {
+                String arrStr[] = {cursor.getString(0), cursor.getString(1)
+                        , cursor.getString(2), cursor.getString(3)
+                        , cursor.getString(4), cursor.getString(5)};
+                writer.writeNext(arrStr);
             }
-            csvWrite.close();
-            curCSV.close();
+            writer.close();
+            cursor.close();
             Toast.makeText(getApplicationContext(), getString(R.string.write_csv_succeed)
                     , Toast.LENGTH_LONG).show();
         } catch (Exception sqlEx) {
-            Log.e("MainActivity", sqlEx.getMessage(), sqlEx);
+            sqlEx.printStackTrace();
         }
     }
 

@@ -176,7 +176,7 @@ public class FilterReactionTestActivity extends AppCompatActivity implements Vie
 
     private void addDataToDatabase(String testUserID, String reactionTime, String gender
             , String age) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.filter_test_type)
+        boolean insertData = dbHelper.addDataToDB(testUserID, getString(R.string.filter_test_type)
                 , reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)

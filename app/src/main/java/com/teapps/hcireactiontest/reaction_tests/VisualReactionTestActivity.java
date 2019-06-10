@@ -171,7 +171,7 @@ public class VisualReactionTestActivity extends AppCompatActivity implements Vie
 
     private void addDataToDatabase(String testUserID, String reactionTime, String gender
             , String age) {
-        boolean insertData = dbHelper.addData(testUserID, getString(R.string.visual_test_type), reactionTime, gender, age);
+        boolean insertData = dbHelper.addDataToDB(testUserID, getString(R.string.visual_test_type), reactionTime, gender, age);
         if (insertData) {
             Toast.makeText(getApplicationContext(), getString(R.string.database_storing_successfull)
                     , Toast.LENGTH_SHORT).show();

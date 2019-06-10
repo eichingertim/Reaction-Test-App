@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addData(String userID, String testType, String reactionTime
+    public boolean addDataToDB(String userID, String testType, String reactionTime
             , String gender, String age) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
